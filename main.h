@@ -5,5 +5,5 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdlib.h>
-
+void handle_return_toline (char **p);
 #endif
