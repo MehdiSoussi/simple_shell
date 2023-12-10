@@ -24,6 +24,13 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		{																	                                	i++;	
 			arguments[i] = strtok(0, " \t\n");
 		}
+		if(_strcmp(arguments[0], "exit") == 0)
+				exit(0);
+		if(_strcmp(arguments[0], "env") == 0)
+		{
+			printenv(envp);
+			continue;
+		}
 		command = handle_path(arguments[0], PATH);
 		if(command == 0)
 		{
@@ -61,6 +68,17 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	return(0);
 }
 
+void printenv(char **envp)
+{
+	int i =0;
+	extern char **environ;
+	(void) envp;
+	while(environ[i])
+	{
+		printf("%s\n", environ[i]);
+		i++;
+	}
+}
 
 char *handle_path(char *command, char *PATH)
 {
@@ -123,9 +141,12 @@ char *_getenv(char *name)
 	extern char **environ;
 	int i;
 	char *token;
+	char *temp;
 	while(environ[i])
 	{
-		token = strtok(environ[i], "=");
+		temp = duplicate_string(environ[i]);
+
+		token = strtok(temp, "=");
 		if(_strcmp(token, name) == 0)
 		{
 			token = strtok(0, "=");
@@ -135,6 +156,19 @@ char *_getenv(char *name)
 	}
 	return 0;
 }
+
+char *duplicate_string(char *environmentvariable)
+{	int j = 0;
+	char *temp = malloc(sizeof(char) * 10000);
+	while(environmentvariable[j] != '\0')
+	{
+		temp[j] = environmentvariable[j];
+		j++;
+	}
+	temp[j] = '\0';
+	return temp;
+}
+
 int _strcmp(char *s1, char *s2)
 {
 	int size = 0;

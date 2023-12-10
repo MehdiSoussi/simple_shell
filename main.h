@@ -12,4 +12,6 @@ char *_getenv(char *name);
 int _strcmp(char *s1, char *s2);
 int _strlen(char *);
 char *path_concatenate(char *token, char* command);
+void printenv(char **envp);
+char *duplicate_string(char *environmentvariable);
 #endif
