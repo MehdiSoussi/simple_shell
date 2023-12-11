@@ -17,9 +17,11 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			exit(0);
 		arguments = malloc(32 * sizeof(char *));
 		for (i = 0; i < 32; i++)
-			arguments[i] = (char *)malloc(128);
+			arguments[i] = (char *)malloc(10000);
 		i = 0;
 		arguments[i] = strtok(buffer, " \t\n");
+		if(arguments[0] == 0)
+			 continue;
 		while (arguments[i])
 		{																	                                	i++;	
 			arguments[i] = strtok(0, " \t\n");
@@ -82,9 +84,10 @@ void printenv(char **envp)
 
 char *handle_path(char *command, char *PATH)
 {
-	int i = 0, existence = access(command, F_OK);
+	int i = 0, existence;
 	char *token, *path_to_check, *PATH_copied;
 
+	existence= access(command, F_OK);
 	PATH_copied = malloc(1024);
 	while(PATH[i] != 0)
 	{
