@@ -27,13 +27,16 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			arguments[i] = strtok(0, " \t\n");
 		}
 		if(_strcmp(arguments[0], "exit") == 0)
+		{
 				exit(0);
+		}	
 		if(_strcmp(arguments[0], "env") == 0)
 		{
 			printenv(envp);
 			continue;
 		}
-		command = handle_path(arguments[0], PATH);
+		handle_path_expetions(PATH, arguments[0], argv[0]);
+		command = handle_path(arguments[0], PATH, argv[0]);
 		if(command == 0)
 		{
 			perror(argv[0]);
@@ -82,12 +85,61 @@ void printenv(char **envp)
 	}
 }
 
-char *handle_path(char *command, char *PATH)
+char *_strconcat(char *s1, char *s2)
+{	
+	char *buffer = malloc(1024);
+	int i = 0, j = 0;
+	while(s1[i] != '\0')
+	{
+		buffer[j] = s1[i];
+		i++;
+		j++;
+	}
+	i = 0;
+	while(s2[i] != '\0')
+	{
+		buffer[j] = s2[i];
+		i++;
+		j++;
+	}
+	buffer[j] = '\0';
+	return buffer;
+
+			
+}
+
+
+void handle_path_expetions(char *PATH, char* command, char* shellname)
+{
+	char *error_message;
+	int len;
+
+	error_message = _strconcat(shellname, ": 1: ");
+	error_message = _strconcat(error_message, command);
+	error_message = _strconcat(error_message, ": not found\n");
+	len = _strlen(error_message);
+	if((PATH == 0 || _strcmp(PATH, "") == 0) && access(command, F_OK) == 0 && command[0] != '/')
+	{
+		write(2, error_message, len);
+		exit(127);
+	}
+
+	if((PATH == 0 || _strcmp(PATH, "") == 0) && access(command, F_OK) != 0)
+	{
+		write(2, error_message, len);
+		exit(127);
+		
+	}
+}
+
+char *handle_path(char *command, char *PATH, char* shellname)
 {
 	int i = 0, existence;
 	char *token, *path_to_check, *PATH_copied;
 
 	existence= access(command, F_OK);
+	if(existence == 0)
+		return command;
 	PATH_copied = malloc(1024);
 	while(PATH[i] != 0)
 	{
@@ -95,21 +147,22 @@ char *handle_path(char *command, char *PATH)
 	i++;
 	}
 	PATH_copied[i] = '\0';
-	if(existence == 0)
-		return command;
-	else
-	{
 		token = strtok(PATH_copied, ":");
 		while(token)
 		{
 			path_to_check = path_concatenate(token, command);
+			if(path_to_check == 0)
+			{
+				perror(shellname);
+				exit(31);
+			}
 			existence = access(path_to_check, F_OK);
 			if(existence == 0)
 				return path_to_check;
 			token = strtok(0, ":");
 		}
 		
-	}
+	
 	
 
 	return 0;
