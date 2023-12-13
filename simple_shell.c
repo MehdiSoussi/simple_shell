@@ -12,7 +12,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	while(1)
 	{
 		if(isatty(0))
-			printf("$ ");
+			write(1, "$ ", 2);
 		if (getline(&buffer, &buffer_size, stdin) == -1)
 			exit(0);
 		arguments = malloc(32 * sizeof(char *));
