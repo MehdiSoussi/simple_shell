@@ -80,7 +80,8 @@ void printenv(char **envp)
 	(void) envp;
 	while(environ[i])
 	{
-		printf("%s\n", environ[i]);
+		write(1, environ[i], _strlen(environ[i]));
+		write(1, "\n", 1);
 		i++;
 	}
 }
