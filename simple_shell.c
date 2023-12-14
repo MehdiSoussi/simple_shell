@@ -7,35 +7,46 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	size_t buffer_size = 0;
 	int x, r, w, i = 0;
 	char **arguments, *command;
-
-	char *PATH = _getenv("PATH");
+	char *env_var_line = 0;
+	char *PATH = _getenv(&env_var_line, "PATH");
+	char *buffer_error;
 	while(1)
 	{
+		arguments = malloc(32 * sizeof(char *));
 		if(isatty(0))
 			write(1, "$ ", 2);
 		if (getline(&buffer, &buffer_size, stdin) == -1)
+		{
+			free(arguments);
+			free(env_var_line);
+			free(buffer);
 			exit(0);
-		arguments = malloc(32 * sizeof(char *));
-		for (i = 0; i < 32; i++)
-			arguments[i] = (char *)malloc(10000);
+		}
+		/*for (i = 0; i < 32; i++)
+		  arguments[i] = (char *)malloc(19000);*/
 		i = 0;
 		arguments[i] = strtok(buffer, " \t\n");
 		if(arguments[0] == 0)
-			 continue;
+			continue;
 		while (arguments[i])
 		{																	                                	i++;	
 			arguments[i] = strtok(0, " \t\n");
 		}
 		if(_strcmp(arguments[0], "exit") == 0)
 		{
-				exit(0);
+			free(arguments);
+			free(buffer);
+			free(env_var_line);
+			exit(0);
 		}	
 		if(_strcmp(arguments[0], "env") == 0)
 		{
 			printenv(envp);
 			continue;
 		}
-		handle_path_expetions(PATH, arguments[0], argv[0]);
+		buffer_error = malloc(1024);
+		handle_path_expetions(&buffer_error, PATH, arguments[0], argv[0]);
+		free(buffer_error);
 		command = handle_path(arguments[0], PATH, argv[0]);
 		if(command == 0)
 		{
@@ -47,14 +58,17 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		if (x == -1)
 		{
 			perror(argv[0]);
+			free(env_var_line);
 			exit(0);
 		}
 		if(x != 0)
 		{
+			free(arguments);
 			w = wait(0);
 			if(w == -1)
 			{
 				perror(argv[0]);
+				free(env_var_line);
 				exit(0);
 			}
 		}
@@ -64,11 +78,16 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			if( r == -1)
 			{
 				perror(argv[0]);
+				free(env_var_line);
+				free(arguments);
+				free(buffer);
 				exit(0);
 			}
 
 		}
 	}
+	free(arguments);
+	free(env_var_line);
 	free(buffer);
 	return(0);
 }
@@ -86,50 +105,49 @@ void printenv(char **envp)
 	}
 }
 
-char *_strconcat(char *s1, char *s2)
+int *_strconcat(char **buffer, char *s1, char *s2)
 {	
-	char *buffer = malloc(1024);
 	int i = 0, j = 0;
 	while(s1[i] != '\0')
 	{
-		buffer[j] = s1[i];
+		(*buffer)[j] = s1[i];
 		i++;
 		j++;
 	}
 	i = 0;
 	while(s2[i] != '\0')
 	{
-		buffer[j] = s2[i];
+		(*buffer)[j] = s2[i];
 		i++;
 		j++;
 	}
-	buffer[j] = '\0';
-	return buffer;
+	(*buffer)[j] = '\0';
 
-			
+return 0;
 }
 
 
-void handle_path_expetions(char *PATH, char* command, char* shellname)
+void handle_path_expetions(char **buffer_error, char *PATH, char* command, char* shellname)
 {
-	char *error_message;
 	int len;
+       	_strconcat(buffer_error, shellname, ": 1: ");
+	_strconcat(buffer_error, *buffer_error, command);
+	_strconcat(buffer_error, *buffer_error, ": not found\n");
+	len = _strlen(*buffer_error);
 
-	error_message = _strconcat(shellname, ": 1: ");
-	error_message = _strconcat(error_message, command);
-	error_message = _strconcat(error_message, ": not found\n");
-	len = _strlen(error_message);
 	if((PATH == 0 || _strcmp(PATH, "") == 0) && access(command, F_OK) == 0 && command[0] != '/')
 	{
-		write(2, error_message, len);
+		write(2, *buffer_error, len);
+		free(*buffer_error);
 		exit(127);
 	}
 
 	if((PATH == 0 || _strcmp(PATH, "") == 0) && access(command, F_OK) != 0)
 	{
-		write(2, error_message, len);
+		write(2, *buffer_error, len);
+		free(*buffer_error);
 		exit(127);
-		
+
 	}
 }
 
@@ -144,27 +162,27 @@ char *handle_path(char *command, char *PATH, char* shellname)
 	PATH_copied = malloc(1024);
 	while(PATH[i] != 0)
 	{
-	PATH_copied[i] = PATH[i];
-	i++;
+		PATH_copied[i] = PATH[i];
+		i++;
 	}
 	PATH_copied[i] = '\0';
-		token = strtok(PATH_copied, ":");
-		while(token)
+	token = strtok(PATH_copied, ":");
+	while(token)
+	{
+		path_to_check = path_concatenate(token, command);
+		if(path_to_check == 0)
 		{
-			path_to_check = path_concatenate(token, command);
-			if(path_to_check == 0)
-			{
-				perror(shellname);
-				exit(31);
-			}
-			existence = access(path_to_check, F_OK);
-			if(existence == 0)
-				return path_to_check;
-			token = strtok(0, ":");
+			perror(shellname);
+			exit(31);
 		}
-		
-	
-	
+		existence = access(path_to_check, F_OK);
+		if(existence == 0)
+			return path_to_check;
+		token = strtok(0, ":");
+	}
+
+
+
 
 	return 0;
 }
@@ -193,52 +211,64 @@ char *path_concatenate(char *token, char* command)
 
 }
 
-char *_getenv(char *name)
+char *_getenv(char **env_var_line, char *name)
 {
 	extern char **environ;
-	int i;
+	int i = 0;
 	char *token;
-	char *temp;
+	int j = 0;
+
 	while(environ[i])
 	{
-		temp = duplicate_string(environ[i]);
+		/*temp = duplicate_string(environ[i]);*/
+		j = 0;
+		(*env_var_line) = malloc(sizeof(char) * 6000);
 
-		token = strtok(temp, "=");
+		while(environ[i][j] != '\0')
+		{
+			(*env_var_line)[j] = environ[i][j];
+			j++;
+		}
+		(*env_var_line)[j] = '\0';
+
+		token = strtok(*env_var_line, "=");
 		if(_strcmp(token, name) == 0)
 		{
 			token = strtok(0, "=");
 			return token;
 		}
 		i++;
+		free(*env_var_line);
+
 	}
 	return 0;
 }
 
-char *duplicate_string(char *environmentvariable)
-{	int j = 0;
-	char *temp = malloc(sizeof(char) * 10000);
-	while(environmentvariable[j] != '\0')
-	{
-		temp[j] = environmentvariable[j];
-		j++;
-	}
-	temp[j] = '\0';
-	return temp;
-}
+/*char *duplicate_string(char *environmentvariable)
+  {	int j = 0;
+  char *temp = malloc(sizeof(char) * 10000);
+  while(environmentvariable[j] != '\0')
+  {
+  temp[j] = environmentvariable[j];
+  j++;
+  }
+  temp[j] = '\0';
+  return temp;
+  }*/
 
 int _strcmp(char *s1, char *s2)
 {
 	int size = 0;
+	int i = 0;
 
-	while (*s1 != '\0' || *s2 != '\0')
+	while (s1[i] != '\0' || s2[i] != '\0')
 	{
-		size += (*s1 - *s2);
-		if ((*s1 - *s2) != 0)
+		size += (s1[i] - s2[i]);
+		if ((s1[i] - s2[i]) != 0)
 		{
 			break;
 		}
-		s1++;
-		s2++;
+		i++;
 	}
 	return (size);
 }
