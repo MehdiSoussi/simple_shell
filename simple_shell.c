@@ -63,8 +63,9 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		}
 		if(x != 0)
 		{
-			free(arguments);
 			w = wait(0);
+			free(arguments);
+			free(command);
 			if(w == -1)
 			{
 				perror(argv[0]);
@@ -155,7 +156,7 @@ char *handle_path(char *command, char *PATH, char* shellname)
 {
 	int i = 0, existence;
 	char *token, *path_to_check, *PATH_copied;
-
+	int x, y;
 	existence= access(command, F_OK);
 	if(existence == 0)
 		return command;
@@ -169,47 +170,73 @@ char *handle_path(char *command, char *PATH, char* shellname)
 	token = strtok(PATH_copied, ":");
 	while(token)
 	{
-		path_to_check = path_concatenate(token, command);
-		if(path_to_check == 0)
-		{
-			perror(shellname);
-			exit(31);
-		}
+		
+	x=0;
+       	y=0;
+	path_to_check = malloc(sizeof(char)*512);
+	if(path_to_check == 0)
+	{
+		perror(shellname);
+		free(PATH_copied);
+		free(path_to_check); /*unsure*/
+		exit(31);
+	}
+	while(token[x] != '\0')
+	{
+		path_to_check[y] = token[x];
+		x++;
+		y++;
+	}
+	path_to_check[y] = 47;
+	y++;
+	x = 0;
+	while(command[x] != '\0')
+	{
+		path_to_check[y] = command[x];
+		x++;
+		y++;
+	}
+	path_to_check[y] = '\0'; 
+		
 		existence = access(path_to_check, F_OK);
 		if(existence == 0)
+		{
+			free(PATH_copied);
 			return path_to_check;
+		}
+		free(path_to_check);
 		token = strtok(0, ":");
 	}
 
 
-
+	free(PATH_copied);
 
 	return 0;
 }
-char *path_concatenate(char *token, char* command)
+/*char *path_concatenate(char *token, char* command)
 {
-	int i=0, j=0;
+	int x=0, j=0;
 	char *temp = malloc(sizeof(char)*512);
-	while(token[i] != '\0')
+	while(token[x] != '\0')
 	{
-		temp[j] = token[i];
-		i++;
-		j++;
+		temp[y] = token[x];
+		x++;
+		y++;
 	}
-	temp[j] = 47;
-	j++;
-	i = 0;
-	while(command[i] != '\0')
+	temp[y] = 47;
+	y++;
+	x = 0;
+	while(command[x] != '\0')
 	{
-		temp[j] = command[i];
-		i++;
-		j++;
+		temp[y] = command[x];
+		x++;
+		y++;
 	}
-	temp[j] = '\0';
+	temp[y] = '\0';
 	return temp;
 
 
-}
+}*/
 
 char *_getenv(char **env_var_line, char *name)
 {
