@@ -96,7 +96,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			w = wait(0);
 			if(flag_free == 1)
 				free(command);
-			/*free(arguments);*/
+			free(arguments);
 			if(w == -1)
 			{
 				/*unsure use of free*/
