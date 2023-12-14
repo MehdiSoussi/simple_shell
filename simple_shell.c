@@ -256,7 +256,7 @@ char *_getenv(char **env_var_line, char *name)
 		if ((*env_var_line) == 0)
 			exit(0);
 
-		while(environ[i][j] != '\0')
+		while (environ[i][j] != '\0')
 		{
 			(*env_var_line)[j] = environ[i][j];
 			j++;
@@ -264,7 +264,7 @@ char *_getenv(char **env_var_line, char *name)
 		(*env_var_line)[j] = '\0';
 
 		token = strtok(*env_var_line, "=");
-		if(_strcmp(token, name) == 0)
+		if (_strcmp(token, name) == 0)
 		{
 			token = strtok(0, "=");
 			return token;
