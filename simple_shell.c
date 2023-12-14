@@ -248,12 +248,12 @@ char *_getenv(char **env_var_line, char *name)
 	char *token;
 	int j = 0;
 
-	while(environ[i])
+	while (environ[i])
 	{
 		/*temp = duplicate_string(environ[i]);*/
 		j = 0;
 		(*env_var_line) = malloc(sizeof(char) * 10000);
-		if((*env_var_line) == 0)
+		if ((*env_var_line) == 0)
 			exit(0);
 
 		while(environ[i][j] != '\0')
