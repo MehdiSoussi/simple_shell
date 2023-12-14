@@ -1,5 +1,13 @@
 #include "main.h"
-
+/**
+ * main - a function
+ *
+ * @argc: input
+ * @argv: input
+ * @envp: input
+ *
+ * Return: 0
+ */
 int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv, __attribute__((unused)) char **envp)
 {
 
@@ -132,7 +140,11 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	free(arguments);
 	return(0);
 }
-
+/**
+ * printenv -  a function
+ *
+ * Return: void
+ */
 void printenv()
 {
 	int i =0;
@@ -144,7 +156,15 @@ void printenv()
 		i++;
 	}
 }
-
+/**
+ * _strconcat - a function
+ *
+ * @buffer: input
+ * @s1: input
+ * @s2: input
+ *
+ * Return: 0
+ */
 int *_strconcat(char **buffer, char *s1, char *s2)
 {	
 	int i = 0, j = 0;
@@ -166,7 +186,16 @@ int *_strconcat(char **buffer, char *s1, char *s2)
 return 0;
 }
 
-
+/**
+ * handle_path_expetions - a function
+ *
+ * @buffer_error: input
+ * @PATH: input
+ * @command: input
+ * @shellname: input
+ *
+ * Return: 0
+ */
 int handle_path_expetions(char **buffer_error, char *PATH, char* command, char* shellname)
 {
 	int len;
@@ -183,6 +212,16 @@ int handle_path_expetions(char **buffer_error, char *PATH, char* command, char* 
 
 	return 0;
 }
+/**
+ * handle_path - a function
+ *
+ * @command: input
+ * @PATH: input
+ * @shellname: input
+ * @flag_free: input
+ *
+ * Return: 0
+ */
 
 char *handle_path(char *command, char *PATH,__attribute__((unused)) char* shellname, int *flag_free)
 {
@@ -246,7 +285,14 @@ char *handle_path(char *command, char *PATH,__attribute__((unused)) char* shelln
 	return 0;
 }
 
-
+/**
+ * _getenv - a function
+ *
+ * @env_var_line: input
+ * @name: input
+ *
+ * Return: 0
+ */
 char *_getenv(char **env_var_line, char *name)
 {
 	extern char **environ;
@@ -278,7 +324,14 @@ char *_getenv(char **env_var_line, char *name)
 	}
 	return 0;
 }
-
+/**
+ * _strcmp - a function
+ *
+ * @s1: input
+ * @s2: input
+ *
+ * Return: size
+ */
 int _strcmp(char *s1, char *s2)
 {
 	int size = 0;
@@ -292,6 +345,13 @@ int _strcmp(char *s1, char *s2)
 	}
 	return (size);
 }
+/**
+ * _strlen - a function
+ *
+ * @s: input
+ *
+ * Return: size
+ */
 int _strlen(char *s)
 {
 	int size = 0;
