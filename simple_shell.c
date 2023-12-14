@@ -45,7 +45,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		buffer_error = malloc(1024);
 		if(buffer_error == 0)
 			exit(2);
-		len  = handle_path_expetions(&buffer_error, PATH, arguments[0], argv[0]):
+		len  = handle_path_expetions(&buffer_error, PATH, arguments[0], argv[0]);
 		if(len != 0)
 		{
 			write(2, buffer_error, len);
@@ -86,6 +86,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 				free(command);
 			if(w == -1)
 			{
+				/*unsure use of free*/
 				free(env_var_line);
 				if(flag_free == 1)
 					free(command);
@@ -156,21 +157,21 @@ int handle_path_expetions(char **buffer_error, char *PATH, char* command, char* 
 	len = _strlen(*buffer_error);
 
 	if((PATH == 0 || _strcmp(PATH, "") == 0) && access(command, F_OK) == 0 && command[0] != '/')
-		return len
+		return len;
 
 	if((PATH == 0 || _strcmp(PATH, "") == 0) && access(command, F_OK) != 0)
-		return len
+		return len;
 
-	return 0
+	return 0;
 }
 
-char *handle_path(char *command, char *PATH, char* shellname, int *flag_free)
+char *handle_path(char *command, char *PATH,__attribute__((unused)) char* shellname, int *flag_free)
 {
 	
 	int i = 0, existence;
 	char *token, *path_to_check, *PATH_copied;
 	int x, y;
-	*flag_free = 0
+	*flag_free = 0;
 	existence= access(command, F_OK);
 	if(existence == 0)
 		return command;
