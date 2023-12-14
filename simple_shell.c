@@ -13,6 +13,8 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	while(1)
 	{
 		arguments = malloc(32 * sizeof(char *));
+		if(arguments == 0)
+			exit(0);
 		if(isatty(0))
 			write(1, "$ ", 2);
 		if (getline(&buffer, &buffer_size, stdin) == -1)
@@ -42,6 +44,8 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			continue;
 		}
 		buffer_error = malloc(1024);
+		if(buffer_error == 0)
+			exit(0);
 		handle_path_expetions(&buffer_error, PATH, arguments[0], argv[0]);
 		free(buffer_error);
 		command = handle_path(arguments[0], PATH, argv[0]);
@@ -158,6 +162,8 @@ char *handle_path(char *command, char *PATH, char* shellname)
 	if(existence == 0)
 		return command;
 	PATH_copied = malloc(1024);
+	if(PATH_copied == 0)
+		exit(0);
 	while(PATH[i] != 0)
 	{
 		PATH_copied[i] = PATH[i];
@@ -246,7 +252,9 @@ char *_getenv(char **env_var_line, char *name)
 	{
 		/*temp = duplicate_string(environ[i]);*/
 		j = 0;
-		(*env_var_line) = malloc(sizeof(char) * 6000);
+		(*env_var_line) = malloc(sizeof(char) * 10000);
+		if((*env_var_line) == 0)
+			exit(0);
 
 		while(environ[i][j] != '\0')
 		{
