@@ -158,8 +158,8 @@ char *handle_path(char *command, char *PATH, char* shellname)
 	int i = 0, existence;
 	char *token, *path_to_check, *PATH_copied;
 	int x, y;
-	existence= access(command, F_OK);
-	if(existence == 0)
+	existence = access(command, F_OK);
+	if (existence == 0)
 		return command;
 	PATH_copied = malloc(1024);
 	if(PATH_copied == 0)
