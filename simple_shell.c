@@ -5,49 +5,65 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 
 	char *buffer = 0;
 	size_t buffer_size = 0;
-	int x, r, w, i = 0;
+	int x, r, w, i = 0, len = 0, flag_free = 0;
 	char **arguments, *command;
 	char *env_var_line = 0;
 	char *PATH = _getenv(&env_var_line, "PATH");
 	char *buffer_error;
 	while(1)
 	{
+		/*Allocating memory for the arguments, "arguments" is an array of strings, the individual arrays should not be allocated as they are automatically allocated by strtok*/
 		arguments = malloc(32 * sizeof(char *));
+		if(arguments == 0)
+			free(arguments);
 		if(isatty(0))
 			write(1, "$ ", 2);
 		if (getline(&buffer, &buffer_size, stdin) == -1)
 		{
-			free(arguments);
 			free(env_var_line);
-			free(buffer);
 			exit(0);
 		}
-		/*for (i = 0; i < 32; i++)
-		  arguments[i] = (char *)malloc(19000);*/
 		i = 0;
 		arguments[i] = strtok(buffer, " \t\n");
 		if(arguments[0] == 0)
 			continue;
 		while (arguments[i])
-		{																	                                	i++;	
+		{
+			i++;	
 			arguments[i] = strtok(0, " \t\n");
 		}
 		if(_strcmp(arguments[0], "exit") == 0)
 		{
-			free(arguments);
-			free(buffer);
 			free(env_var_line);
 			exit(0);
 		}	
 		if(_strcmp(arguments[0], "env") == 0)
 		{
-			printenv(envp);
+			printenv();
 			continue;
 		}
 		buffer_error = malloc(1024);
-		handle_path_expetions(&buffer_error, PATH, arguments[0], argv[0]);
-		free(buffer_error);
-		command = handle_path(arguments[0], PATH, argv[0]);
+		if(buffer_error == 0)
+			exit(2);
+		len  = handle_path_expetions(&buffer_error, PATH, arguments[0], argv[0]):
+		if(len != 0)
+		{
+			write(2, buffer_error, len);
+			free(env_var_line);
+			free(buffer_error);
+			exit(127);
+		}
+		else
+		{
+			free(buffer_error);
+		}
+		/*
+		/bin/ls => Return /bin/ls (No malloc should be handled after) => No action necessary
+		ls =>  Return /bin/ls (PATH_copied malloced once and freed guaranteed!, path_to_check malloced and freed as many times until it gets found and when it it found it is not freed and flag_free = 1 is set to display to the main that it should be freed)
+		/bin/xxx Return 0 (PATH_copied malloced once and freed guaranteed!, path_to_check malloced and freed as many times) => No action necessary
+		xxx Return 0 (PATH_copied malloced once and freed guaranteed!, path_to_check malloced and freed as many times) => No action necessary
+		*/
+		command = handle_path(arguments[0], PATH, argv[0], &flag_free);
 		if(command == 0)
 		{
 			perror(argv[0]);
@@ -57,19 +73,23 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		x = fork();
 		if (x == -1)
 		{
-			perror(argv[0]);
 			free(env_var_line);
+			if(flag_free == 1)
+				free(command);
+			perror(argv[0]);
 			exit(0);
 		}
 		if(x != 0)
 		{
 			w = wait(0);
-			free(arguments);
-			free(command);
+			if(flag_free == 1)
+				free(command);
 			if(w == -1)
 			{
-				perror(argv[0]);
 				free(env_var_line);
+				if(flag_free == 1)
+					free(command);
+				perror(argv[0]);
 				exit(0);
 			}
 		}
@@ -78,26 +98,25 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			r = execve(command, arguments, envp);
 			if( r == -1)
 			{
-				perror(argv[0]);
 				free(env_var_line);
-				free(arguments);
-				free(buffer);
+				if(flag_free == 1)
+					free(command);
+				perror(argv[0]);
 				exit(0);
 			}
 
 		}
 	}
-	free(arguments);
 	free(env_var_line);
-	free(buffer);
+	if(flag_free == 1)
+		free(command);
 	return(0);
 }
 
-void printenv(char **envp)
+void printenv()
 {
 	int i =0;
 	extern char **environ;
-	(void) envp;
 	while(environ[i])
 	{
 		write(1, environ[i], _strlen(environ[i]));
@@ -128,39 +147,36 @@ return 0;
 }
 
 
-void handle_path_expetions(char **buffer_error, char *PATH, char* command, char* shellname)
+int handle_path_expetions(char **buffer_error, char *PATH, char* command, char* shellname)
 {
 	int len;
-       	_strconcat(buffer_error, shellname, ": 1: ");
+    _strconcat(buffer_error, shellname, ": 1: ");
 	_strconcat(buffer_error, *buffer_error, command);
 	_strconcat(buffer_error, *buffer_error, ": not found\n");
 	len = _strlen(*buffer_error);
 
 	if((PATH == 0 || _strcmp(PATH, "") == 0) && access(command, F_OK) == 0 && command[0] != '/')
-	{
-		write(2, *buffer_error, len);
-		free(*buffer_error);
-		exit(127);
-	}
+		return len
 
 	if((PATH == 0 || _strcmp(PATH, "") == 0) && access(command, F_OK) != 0)
-	{
-		write(2, *buffer_error, len);
-		free(*buffer_error);
-		exit(127);
+		return len
 
-	}
+	return 0
 }
 
-char *handle_path(char *command, char *PATH, char* shellname)
+char *handle_path(char *command, char *PATH, char* shellname, int *flag_free)
 {
+	
 	int i = 0, existence;
 	char *token, *path_to_check, *PATH_copied;
 	int x, y;
+	*flag_free = 0
 	existence= access(command, F_OK);
 	if(existence == 0)
 		return command;
 	PATH_copied = malloc(1024);
+	if(PATH_copied == 0)
+		exit(2);
 	while(PATH[i] != 0)
 	{
 		PATH_copied[i] = PATH[i];
@@ -172,15 +188,11 @@ char *handle_path(char *command, char *PATH, char* shellname)
 	{
 		
 	x=0;
-       	y=0;
+    y=0;
 	path_to_check = malloc(sizeof(char)*512);
 	if(path_to_check == 0)
-	{
-		perror(shellname);
-		free(PATH_copied);
-		free(path_to_check); /*unsure*/
-		exit(31);
-	}
+			exit(2);
+	
 	while(token[x] != '\0')
 	{
 		path_to_check[y] = token[x];
@@ -202,6 +214,7 @@ char *handle_path(char *command, char *PATH, char* shellname)
 		if(existence == 0)
 		{
 			free(PATH_copied);
+			*flag_free = 1;
 			return path_to_check;
 		}
 		free(path_to_check);
@@ -210,47 +223,22 @@ char *handle_path(char *command, char *PATH, char* shellname)
 
 
 	free(PATH_copied);
-
 	return 0;
 }
-/*char *path_concatenate(char *token, char* command)
-{
-	int x=0, j=0;
-	char *temp = malloc(sizeof(char)*512);
-	while(token[x] != '\0')
-	{
-		temp[y] = token[x];
-		x++;
-		y++;
-	}
-	temp[y] = 47;
-	y++;
-	x = 0;
-	while(command[x] != '\0')
-	{
-		temp[y] = command[x];
-		x++;
-		y++;
-	}
-	temp[y] = '\0';
-	return temp;
 
-
-}*/
 
 char *_getenv(char **env_var_line, char *name)
 {
 	extern char **environ;
-	int i = 0;
+	int i = 0,  j = 0;
 	char *token;
-	int j = 0;
 
 	while(environ[i])
 	{
-		/*temp = duplicate_string(environ[i]);*/
 		j = 0;
 		(*env_var_line) = malloc(sizeof(char) * 6000);
-
+		if((*env_var_line) == 0)
+			exit(2);
 		while(environ[i][j] != '\0')
 		{
 			(*env_var_line)[j] = environ[i][j];
@@ -271,30 +259,15 @@ char *_getenv(char **env_var_line, char *name)
 	return 0;
 }
 
-/*char *duplicate_string(char *environmentvariable)
-  {	int j = 0;
-  char *temp = malloc(sizeof(char) * 10000);
-  while(environmentvariable[j] != '\0')
-  {
-  temp[j] = environmentvariable[j];
-  j++;
-  }
-  temp[j] = '\0';
-  return temp;
-  }*/
-
 int _strcmp(char *s1, char *s2)
 {
 	int size = 0;
 	int i = 0;
-
 	while (s1[i] != '\0' || s2[i] != '\0')
 	{
 		size += (s1[i] - s2[i]);
 		if ((s1[i] - s2[i]) != 0)
-		{
 			break;
-		}
 		i++;
 	}
 	return (size);
@@ -302,11 +275,7 @@ int _strcmp(char *s1, char *s2)
 int _strlen(char *s)
 {
 	int size = 0;
-
-	while (*s != '\0')
-	{
+	while (s[size] != '\0')
 		size++;
-		s++;
-	}
 	return (size);
 }
