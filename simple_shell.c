@@ -17,9 +17,6 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			write(1, "$ ", 2);
 		if (getline(&buffer, &buffer_size, stdin) == -1)
 		{
-			free(arguments);
-			free(env_var_line);
-			free(buffer);
 			exit(0);
 		}
 		/*for (i = 0; i < 32; i++)
