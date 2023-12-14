@@ -15,18 +15,23 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		/*Allocating memory for the arguments, "arguments" is an array of strings, the individual arrays should not be allocated as they are automatically allocated by strtok*/
 		arguments = malloc(32 * sizeof(char *));
 		if(arguments == 0)
-			free(arguments);
+			exit(2);
 		if(isatty(0))
 			write(1, "$ ", 2);
 		if (getline(&buffer, &buffer_size, stdin) == -1)
 		{
+			free(buffer);
+			free(arguments);
 			free(env_var_line);
 			exit(0);
 		}
 		i = 0;
 		arguments[i] = strtok(buffer, " \t\n");
 		if(arguments[0] == 0)
+		{
+			free(arguments);
 			continue;
+		}
 		while (arguments[i])
 		{
 			i++;	
@@ -34,11 +39,14 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		}
 		if(_strcmp(arguments[0], "exit") == 0)
 		{
+			free(buffer);
 			free(env_var_line);
+			free(arguments);
 			exit(0);
 		}	
 		if(_strcmp(arguments[0], "env") == 0)
 		{
+			free(arguments);
 			printenv();
 			continue;
 		}
@@ -51,6 +59,8 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			write(2, buffer_error, len);
 			free(env_var_line);
 			free(buffer_error);
+			free(arguments);
+			free(buffer);
 			exit(127);
 		}
 		else
@@ -67,16 +77,18 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		if(command == 0)
 		{
 			perror(argv[0]);
+			free(arguments);
 			continue;
 		}
-
 		x = fork();
 		if (x == -1)
 		{
 			free(env_var_line);
 			if(flag_free == 1)
 				free(command);
+			free(buffer);
 			perror(argv[0]);
+			free(arguments);
 			exit(0);
 		}
 		if(x != 0)
@@ -84,12 +96,15 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			w = wait(0);
 			if(flag_free == 1)
 				free(command);
+			/*free(arguments);*/
 			if(w == -1)
 			{
 				/*unsure use of free*/
 				free(env_var_line);
 				if(flag_free == 1)
 					free(command);
+				free(arguments);
+				free(buffer);
 				perror(argv[0]);
 				exit(0);
 			}
@@ -102,6 +117,8 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 				free(env_var_line);
 				if(flag_free == 1)
 					free(command);
+				free(arguments);
+				free(buffer);
 				perror(argv[0]);
 				exit(0);
 			}
@@ -111,6 +128,8 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	free(env_var_line);
 	if(flag_free == 1)
 		free(command);
+	free(buffer);
+	free(arguments);
 	return(0);
 }
 
