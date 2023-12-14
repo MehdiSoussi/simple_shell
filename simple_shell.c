@@ -162,9 +162,9 @@ char *handle_path(char *command, char *PATH, char* shellname)
 	if (existence == 0)
 		return command;
 	PATH_copied = malloc(1024);
-	if(PATH_copied == 0)
+	if (PATH_copied == 0)
 		exit(0);
-	while(PATH[i] != 0)
+	while (PATH[i] != 0)
 	{
 		PATH_copied[i] = PATH[i];
 		i++;
