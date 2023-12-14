@@ -125,14 +125,14 @@ int *_strconcat(char **buffer, char *s1, char *s2)
 	}
 	(*buffer)[j] = '\0';
 
-return 0;
+	return 0;
 }
 
 
 void handle_path_expetions(char **buffer_error, char *PATH, char* command, char* shellname)
 {
 	int len;
-       	_strconcat(buffer_error, shellname, ": 1: ");
+	_strconcat(buffer_error, shellname, ": 1: ");
 	_strconcat(buffer_error, *buffer_error, command);
 	_strconcat(buffer_error, *buffer_error, ": not found\n");
 	len = _strlen(*buffer_error);
@@ -173,34 +173,34 @@ char *handle_path(char *command, char *PATH, char* shellname)
 	token = strtok(PATH_copied, ":");
 	while(token)
 	{
-		
-	x=0;
-       	y=0;
-	path_to_check = malloc(sizeof(char)*512);
-	if(path_to_check == 0)
-	{
-		perror(shellname);
-		free(PATH_copied);
-		free(path_to_check); /*unsure*/
-		exit(31);
-	}
-	while(token[x] != '\0')
-	{
-		path_to_check[y] = token[x];
-		x++;
+
+		x=0;
+		y=0;
+		path_to_check = malloc(sizeof(char)*512);
+		if(path_to_check == 0)
+		{
+			perror(shellname);
+			free(PATH_copied);
+			free(path_to_check); /*unsure*/
+			exit(31);
+		}
+		while(token[x] != '\0')
+		{
+			path_to_check[y] = token[x];
+			x++;
+			y++;
+		}
+		path_to_check[y] = 47;
 		y++;
-	}
-	path_to_check[y] = 47;
-	y++;
-	x = 0;
-	while(command[x] != '\0')
-	{
-		path_to_check[y] = command[x];
-		x++;
-		y++;
-	}
-	path_to_check[y] = '\0'; 
-		
+		x = 0;
+		while(command[x] != '\0')
+		{
+			path_to_check[y] = command[x];
+			x++;
+			y++;
+		}
+		path_to_check[y] = '\0'; 
+
 		existence = access(path_to_check, F_OK);
 		if(existence == 0)
 		{
@@ -217,29 +217,29 @@ char *handle_path(char *command, char *PATH, char* shellname)
 	return 0;
 }
 /*char *path_concatenate(char *token, char* command)
-{
-	int x=0, j=0;
-	char *temp = malloc(sizeof(char)*512);
-	while(token[x] != '\0')
-	{
-		temp[y] = token[x];
-		x++;
-		y++;
-	}
-	temp[y] = 47;
-	y++;
-	x = 0;
-	while(command[x] != '\0')
-	{
-		temp[y] = command[x];
-		x++;
-		y++;
-	}
-	temp[y] = '\0';
-	return temp;
+  {
+  int x=0, j=0;
+  char *temp = malloc(sizeof(char)*512);
+  while(token[x] != '\0')
+  {
+  temp[y] = token[x];
+  x++;
+  y++;
+  }
+  temp[y] = 47;
+  y++;
+  x = 0;
+  while(command[x] != '\0')
+  {
+  temp[y] = command[x];
+  x++;
+  y++;
+  }
+  temp[y] = '\0';
+  return temp;
 
 
-}*/
+  }*/
 
 char *_getenv(char **env_var_line, char *name)
 {
