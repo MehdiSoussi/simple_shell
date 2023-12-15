@@ -12,7 +12,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 {
 
 	char *buffer = 0;
-	/*size_t buffer_size = 0;*/
+	size_t buffer_size = 0;
 	int x, r, w, i = 0, len = 0, flag_free = 0, should_free = 1;
 	char **arguments, *command;
 	char *env_var_line = 0;
