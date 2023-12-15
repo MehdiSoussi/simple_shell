@@ -13,10 +13,10 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 
 	char *buffer = 0;
 	size_t buffer_size = 0;
-	int x, r, w, i = 0, len = 0, flag_free = 0;
+	int x, r, w, i = 0, len = 0, flag_free = 0, should_free = 1;
 	char **arguments, *command;
 	char *env_var_line = 0;
-	char *PATH = _getenv(&env_var_line, "PATH");
+	char *PATH = _getenv(&env_var_line, "PATH", &should_free);
 	char *buffer_error;
 	while(1)
 	{
@@ -30,6 +30,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		{
 			free(buffer);
 			free(arguments);
+			if(should_free == 1)
 			free(env_var_line);
 			exit(0);
 		}
@@ -48,6 +49,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		if(_strcmp(arguments[0], "exit") == 0)
 		{
 			free(buffer);
+			if(should_free == 1)
 			free(env_var_line);
 			free(arguments);
 			exit(0);
@@ -65,6 +67,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		if(len != 0)
 		{
 			write(2, buffer_error, len);
+			if(should_free == 1)
 			free(env_var_line);
 			free(buffer_error);
 			free(arguments);
@@ -91,6 +94,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		x = fork();
 		if (x == -1)
 		{
+			if(should_free == 1)
 			free(env_var_line);
 			if(flag_free == 1)
 				free(command);
@@ -108,6 +112,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			if(w == -1)
 			{
 				/*unsure use of free*/
+				if(should_free == 1)
 				free(env_var_line);
 				if(flag_free == 1)
 					free(command);
@@ -122,6 +127,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			r = execve(command, arguments, envp);
 			if( r == -1)
 			{
+				if(should_free == 1)
 				free(env_var_line);
 				if(flag_free == 1)
 					free(command);
@@ -133,6 +139,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 
 		}
 	}
+	if(should_free == 1)
 	free(env_var_line);
 	if(flag_free == 1)
 		free(command);
@@ -293,7 +300,7 @@ char *handle_path(char *command, char *PATH,__attribute__((unused)) char* shelln
  *
  * Return: 0
  */
-char *_getenv(char **env_var_line, char *name)
+char *_getenv(char **env_var_line, char *name, int* should_free)
 {
 	extern char **environ;
 	int i = 0,  j = 0;
@@ -322,6 +329,7 @@ char *_getenv(char **env_var_line, char *name)
 		free(*env_var_line);
 
 	}
+	*should_free = 0;
 	return 0;
 }
 /**
