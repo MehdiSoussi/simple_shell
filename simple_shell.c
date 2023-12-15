@@ -18,6 +18,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	char *env_var_line = 0;
 	char *PATH = _getenv(&env_var_line, "PATH", &should_free);
 	char *buffer_error;
+	int status = 0;
 	while(1)
 	{
 		/*Allocating memory for the arguments, "arguments" is an array of strings, the individual arrays should not be allocated as they are automatically allocated by strtok*/
@@ -52,8 +53,14 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			if(should_free == 1)
 			free(env_var_line);
 			free(arguments);
+			if (status == 0)
 			exit(0);
+			else
+			{
+			exit(2);
+			}
 		}	
+		/* Might need to add an: status = 0; */
 		if(_strcmp(arguments[0], "env") == 0)
 		{
 			free(arguments);
@@ -105,7 +112,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		}
 		if(x != 0)
 		{
-			w = wait(0);
+			w = wait(&status);
 			if(flag_free == 1)
 				free(command);
 			free(arguments);
