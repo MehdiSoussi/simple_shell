@@ -27,8 +27,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			exit(2);
 		if(isatty(0))
 			write(1, "$ ", 2);
-		/*if (getline(&buffer, &buffer_size, stdin) == -1)*/
-		 if(_getline(&buffer) == -1)
+		if (getline(&buffer, &buffer_size, stdin) == -1)
 		{
 			free(buffer);
 			free(arguments);
@@ -374,27 +373,4 @@ int _strlen(char *s)
 	while (s[size] != '\0')
 		size++;
 	return (size);
-}
-
-
-int _getline(char **buffer)
-{
-	int i = 0, r;
-
-	*buffer = malloc(10000);
-	if (*buffer == 0)
-		return -1;
-
-	while (1)
-	{
-		r = read(0, &((*buffer)[i]), 1);
-		if (r == 0)
-			return (-1);
-
-		if ((*buffer)[i] == '\n')
-			break;
-		i++;
-	}
-	(*buffer)[i] = '\0';
-	return (_strlen(*buffer));
 }
