@@ -37,15 +37,22 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		}
 		i = 0;
 		arguments[i] = strtok(buffer, " \t\n");
-		if(arguments[0] == 0)
+		if(arguments[0] == 0 || arguments[i][0] == '#')
 		{
 			free(arguments);
 			continue;
 		}
 		while (arguments[i])
-		{
-			i++;	
+		{	
+			i++;
 			arguments[i] = strtok(0, " \t\n");
+			if (arguments[i] && arguments[i][0] == '#')
+			{
+				arguments[i] = 0;
+				break;
+			}
+
+
 		}
 		if(_strcmp(arguments[0], "exit") == 0)
 		{
