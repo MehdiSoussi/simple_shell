@@ -49,7 +49,8 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		}
 		if(_strcmp(arguments[0], "exit") == 0)
 		{
-			free(buffer);
+			handle_free(arguments, buffer, env_var_line, should_free, status, i, argv[0]);
+			/*free(buffer);
 			if(should_free == 1)
 			free(env_var_line);
 			free(arguments);
@@ -58,7 +59,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			else
 			{
 			exit(2);
-			}
+			}*/
 		}	
 		/* Might need to add an: status = 0; */
 		if(_strcmp(arguments[0], "env") == 0)
@@ -154,6 +155,50 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	free(arguments);
 	return(0);
 }
+void handle_free(char **arguments, char *buffer, char *env_var_line, int should_free, int status, int i, char *shell_name)
+{
+
+	if(i != 2)
+	{
+	free_grouping(buffer, should_free, env_var_line,  arguments);
+	if (status == 0)
+		exit(0);
+		
+	else
+		exit(2);
+	}
+	else
+	{
+	if(_strcmp(arguments[1], "1000") == 0)
+	{
+		free_grouping(buffer, should_free, env_var_line,  arguments);
+		exit(232);
+	}
+	else
+	{
+		if(_strcmp(arguments[1], "98") == 0)
+		{
+			free_grouping(buffer, should_free, env_var_line,  arguments);
+			exit(98);
+		}
+		write(2, shell_name, _strlen(shell_name)); 
+		write(2, ": 1: exit: Illegal number: ", 27);
+		write(2, arguments[1], _strlen(arguments[1]));
+		write(2, "\n", 1);
+		free_grouping(buffer, should_free, env_var_line,  arguments);
+		exit(2);
+	}
+	}
+}
+
+void free_grouping(char *buffer, int should_free, char *env_var_line,  char **arguments)
+{
+ free(buffer);
+	 if(should_free == 1)
+		free(env_var_line);
+	free(arguments);
+}
+
 /**
  * printenv -  a function
  *
