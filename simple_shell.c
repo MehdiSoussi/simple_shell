@@ -166,11 +166,26 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	free(arguments);
 	return(0);
 }
+/**
+ * handle_variables - a function
+ * @arguments: input
+ * Return: void
+ */
 void handle_variables(char **arguments)
 {
 		free(arguments);
 		write(1, "0\n", 2);
 }
+/**
+ * handle_free - a function 
+ * @arguments: input
+ * @buffer: input
+ * @env_var_line: input
+ * @status: input
+ * @i: input
+ * @shell_name: input
+ * Return: void
+ */
 void handle_free(char **arguments, char *buffer, char *env_var_line, int should_free, int status, int i, char *shell_name)
 {
 
@@ -206,7 +221,14 @@ void handle_free(char **arguments, char *buffer, char *env_var_line, int should_
 	}
 	}
 }
-
+/**
+ * free_grouping - a function
+ * @buffer: input
+ * @should_free: input
+ * @env_var_line: input
+ * @arguments: input
+ * Return: void
+ */
 void free_grouping(char *buffer, int should_free, char *env_var_line,  char **arguments)
 {
  free(buffer);
