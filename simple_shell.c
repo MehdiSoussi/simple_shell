@@ -31,7 +31,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		{
 			free(buffer);
 			free(arguments);
-			if(should_free == 1)
+			if (should_free == 1)
 			free(env_var_line);
 			exit(0);
 		}
