@@ -25,7 +25,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		arguments = malloc(32 * sizeof(char *));
 		if (arguments == 0)
 			exit(2);
-		if(isatty(0))
+		if (isatty(0))
 			write(1, "$ ", 2);
 		if (getline(&buffer, &buffer_size, stdin) == -1)
 		{
