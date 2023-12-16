@@ -37,7 +37,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 		}
 		i = 0;
 		arguments[i] = strtok(buffer, " \t\n");
-		if(arguments[0] == 0 || arguments[i][0] == '#')
+		if (arguments[0] == 0 || arguments[i][0] == '#')
 		{
 			free(arguments);
 			continue;
