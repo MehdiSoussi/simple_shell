@@ -43,7 +43,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			continue;
 		}
 		while (arguments[i])
-		{	
+		{
 			i++;
 			arguments[i] = strtok(0, " \t\n");
 			if (arguments[i] && arguments[i][0] == '#')
