@@ -67,7 +67,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			{
 			exit(2);
 			}*/
-		}	
+		}
 		/* Might need to add an: status = 0; */
 		if(_strcmp(arguments[0], "env") == 0)
 		{
