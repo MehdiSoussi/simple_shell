@@ -69,7 +69,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			}*/
 		}
 		/* Might need to add an: status = 0; */
-		if(_strcmp(arguments[0], "env") == 0)
+		if (_strcmp(arguments[0], "env") == 0)
 		{
 			free(arguments);
 			printenv();
