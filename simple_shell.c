@@ -75,6 +75,10 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			printenv();
 			continue;
 		}
+		if(_strcmp(arguments[0], "$?") == 0)
+		{
+			handle_variables(arguments);
+			continue;	}
 		buffer_error = malloc(1024);
 		if(buffer_error == 0)
 			exit(2);
@@ -161,6 +165,11 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	free(buffer);
 	free(arguments);
 	return(0);
+}
+void handle_variables(char **arguments)
+{
+		free(arguments);
+		write(1, "0\n", 2);
 }
 void handle_free(char **arguments, char *buffer, char *env_var_line, int should_free, int status, int i, char *shell_name)
 {
