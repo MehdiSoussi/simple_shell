@@ -23,7 +23,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	{
 		/*Allocating memory for the arguments, "arguments" is an array of strings, the individual arrays should not be allocated as they are automatically allocated by strtok*/
 		arguments = malloc(32 * sizeof(char *));
-		if(arguments == 0)
+		if (arguments == 0)
 			exit(2);
 		if(isatty(0))
 			write(1, "$ ", 2);
