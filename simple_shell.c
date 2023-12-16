@@ -75,7 +75,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 			printenv();
 			continue;
 		}
-		if(_strcmp(arguments[0], "$?") == 0)
+		if (_strcmp(arguments[0], "$?") == 0)
 		{
 			handle_variables(arguments);
 			continue;	}
