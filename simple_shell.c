@@ -181,6 +181,7 @@ void handle_variables(char **arguments)
  * @arguments: input
  * @buffer: input
  * @env_var_line: input
+ * @should_free: input
  * @status: input
  * @i: input
  * @shell_name: input
@@ -384,10 +385,9 @@ char *handle_path(char *command, char *PATH,__attribute__((unused)) char* shelln
 
 /**
  * _getenv - a function
- *
+ * @should_free: input
  * @env_var_line: input
  * @name: input
- *
  * Return: 0
  */
 char *_getenv(char **env_var_line, char *name, int* should_free)
