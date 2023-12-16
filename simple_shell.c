@@ -54,7 +54,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 
 
 		}
-		if(_strcmp(arguments[0], "exit") == 0)
+		if (_strcmp(arguments[0], "exit") == 0)
 		{
 			handle_free(arguments, buffer, env_var_line, should_free, status, i, argv[0]);
 			/*free(buffer);
