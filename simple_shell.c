@@ -19,7 +19,7 @@ int main (__attribute__((unused)) int argc, __attribute__((unused)) char **argv,
 	char *PATH = _getenv(&env_var_line, "PATH", &should_free);
 	char *buffer_error;
 	int status = 0;
-	while(1)
+	while (1)
 	{
 		/*Allocating memory for the arguments, "arguments" is an array of strings, the individual arrays should not be allocated as they are automatically allocated by strtok*/
 		arguments = malloc(32 * sizeof(char *));
